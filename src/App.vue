@@ -63,9 +63,24 @@ const handleLogout = () => {
   localStorage.removeItem(LOCAL_STORAGE_KEY);
 };
 
+const toggleComplete = (id: string) => {
+  if (!isLoggedIn.value) return;
+
+  const todo = todos.value.find(t => t.id === id);
+  if (todo) {
+    todo.completed = !todo.completed;
+  }
+};
+
+const deleteTodo = (id: string) => {
+  if (!isLoggedIn.value || !todos.value) return;
+
+  todos.value = todos.value.filter((todo) => todo.id !== id);
+};
+
 const addTodo = (e: Event) => {
   e.preventDefault();
-  if (!isLoggedIn.value || newTodoText.value.trim() === '') return;
+  if (!isLoggedIn.value || !todos.value || newTodoText.value.trim() === '') return;
 
   const newTodoItem: Todo = {
     id: generateId(),
@@ -75,21 +90,6 @@ const addTodo = (e: Event) => {
 
   todos.value.unshift(newTodoItem);
   newTodoText.value = '';
-};
-
-const toggleComplete = (id: string) => {
-  if (!isLoggedIn.value) return;
-
-  const index = todos.value.findIndex(t => t.id === id);
-  if (index !== -1) {
-    todos.value[index].completed = !todos.value[index].completed;
-  }
-};
-
-const deleteTodo = (id: string) => {
-  if (!isLoggedIn.value) return;
-
-  todos.value = todos.value.filter((todo) => todo.id !== id);
 };
 </script>
 
