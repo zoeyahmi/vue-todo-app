@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 
-// --- TYPES & UTILS ---
 interface Todo {
   id: string;
   text: string;
@@ -18,7 +17,6 @@ const LOCAL_STORAGE_KEY = 'vue-todos-list';
 const DUMMY_USERNAME = 'guest@mail.com';
 const DUMMY_PASSWORD = 'password123';
 
-// --- STATE ---
 const isLoggedIn = ref(false);
 const todos = ref<Todo[]>([]);
 const newTodoText = ref('');
@@ -26,31 +24,27 @@ const loginUsername = ref('');
 const loginPassword = ref('');
 const loginError = ref('');
 
-// --- LIFECYCLE (Loading from Local Storage) ---
 onMounted(() => {
   if (typeof window !== 'undefined') {
     const savedTodos = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (savedTodos) {
-      // Use JSON.parse and cast to the correct array type
       todos.value = JSON.parse(savedTodos) as Todo[];
     } else {
-      // Default initial state
       todos.value = [
         { id: generateId(), text: 'Respond to urgent emails', completed: true },
         { id: generateId(), text: 'Buy groceries', completed: false },
+        { id: generateId(), text: 'Go to the gym', completed: false },
       ];
     }
   }
 });
 
-// --- WATCHER (Saving to Local Storage) ---
 watch(todos, (newTodos) => {
   if (typeof window !== 'undefined' && isLoggedIn.value) {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newTodos));
   }
-}, { deep: true }); // 'deep: true' ensures it watches for changes inside the objects in the array
+}, { deep: true }); 
 
-// --- AUTH HANDLERS ---
 const handleLogin = (e: Event) => {
   e.preventDefault();
   loginError.value = '';
@@ -66,10 +60,9 @@ const handleLogin = (e: Event) => {
 
 const handleLogout = () => {
   isLoggedIn.value = false;
-  // Optional: localStorage.removeItem(LOCAL_STORAGE_KEY);
+  localStorage.removeItem(LOCAL_STORAGE_KEY);
 };
 
-// --- CRUD HANDLERS ---
 const addTodo = (e: Event) => {
   e.preventDefault();
   if (!isLoggedIn.value || newTodoText.value.trim() === '') return;
@@ -80,7 +73,6 @@ const addTodo = (e: Event) => {
     completed: false,
   };
 
-  // Prepend new todo
   todos.value.unshift(newTodoItem);
   newTodoText.value = '';
 };
@@ -90,7 +82,6 @@ const toggleComplete = (id: string) => {
 
   const index = todos.value.findIndex(t => t.id === id);
   if (index !== -1) {
-    // Vue automatically handles reactivity here
     todos.value[index].completed = !todos.value[index].completed;
   }
 };
